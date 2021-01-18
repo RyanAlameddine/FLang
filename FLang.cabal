@@ -1,0 +1,62 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: bf12474f5d4c3c1d4491592e90e06e8eb7d5858b1349809b9037a8bb6bd0c26d
+
+name:           FLang
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/FLang#readme>
+homepage:       https://github.com/githubuser/FLang#readme
+bug-reports:    https://github.com/githubuser/FLang/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2021 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/FLang
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_FLang
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
+
+executable FLang-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_FLang
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      FLang
+    , base >=4.7 && <5
+  default-language: Haskell2010
+
+test-suite FLang-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_FLang
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      FLang
+    , base >=4.7 && <5
+  default-language: Haskell2010
