@@ -275,3 +275,103 @@ matchAll = match and
 matchAny :: [a -> Bool] -> a -> Bool
 matchAny = match or
 
+--------------------
+-- PARSER LIBRARY --
+--------------------
+
+parse :: String -> CoreProgram
+parse = syntax . tokens
+
+--List of tokens -> list of possible parses
+newtype Parser a = Parser { runParser :: [Token] -> [(a, [Token])] }
+
+instance Functor Parser where
+    fmap f (Parser p) = Parser (fmap transform p)
+        where
+            transform = map $ first f
+
+instance Applicative Parser where
+    pure val = Parser $ \input -> [(val, input)]
+    (Parser f) <*> (Parser a) = Parser $ \input -> do
+                                            (func, input' ) <- f input 
+                                            (val , input'') <- a input'
+                                            return (func val, input'')
+
+instance Monad Parser where
+    --(Parser a) >>= f = Parser $ \tokens -> concat [runParser (f val) tokens' | (val, tokens') <- a tokens]
+    (Parser a) >>= f = Parser $ \input -> do
+                            (val , input') <- a input
+                            runParser (f val) input'
+
+instance Alternative Parser where
+    empty = Parser $ const []
+    (Parser p1) <|> (Parser p2) = Parser $ \input -> p1 input <|> p2 input --maybe make this more defined
+
+--checks if string (token) matches condition, outputs that string
+pSat :: (String -> Bool) -> Parser String
+pSat f = Parser satisfy
+    where
+        satisfy ((_, t):ts) | f t = [(t, ts)]
+        satisfy _ = []
+
+--takes in a string and returns a parser which parses that literal
+pLit :: String -> Parser String
+pLit = pSat . (==)
+
+--parses a variable identifier
+pVar :: Parser String
+pVar = pSat check
+    where
+        --starts with alphanumeric and is not a keyword
+        check token@(c:_) = isAlpha c && token `notElem` keywords
+
+--parses a number
+pNum :: Parser Int
+pNum = read <$> pSat check
+    where 
+        check = isJust . (readMaybe :: String -> Maybe Int)
+
+--make these more efficient by removing ambiguity?
+
+pZeroOrMore :: Parser a -> Parser [a]
+pZeroOrMore p = return [] <|> pOneOrMore p
+
+pOneOrMore :: Parser a -> Parser [a]
+pOneOrMore p = do
+            val <- p
+            others <- pZeroOrMore p
+            return $ val : others
+
+--parse one or more of a with b in between each a
+pOneOrMoreSep :: Parser a -> Parser b -> Parser [a]
+pOneOrMoreSep a b = do
+                val    <- a             --check for a
+                others <- pre           --check for all the other b-a
+                return $ val : others   --return a:others
+    where pre = do 
+            _   <- b                    --check for b and discard result
+            val <- a                    --check for a
+            others <- return [] <|> pre --check if zero or more
+            return $ val : others       --return a:others
+
+--returns a parser which only returns the last element
+--fmapLast f = undefined
+
+--liftM2 runs parser a, then parser b, then returns f a b which is c
+
+--hello or goodbye
+pHelloOrGoodbye :: Parser String
+pHelloOrGoodbye = pLit "hello" <|> pLit "goodbye"
+
+--hello or goodbye followed by a variable name
+pGreeting :: Parser (String, String)
+pGreeting = liftM2 (,) pHelloOrGoodbye pVar
+
+--zero or more greetings
+pGreetings :: Parser [(String, String)]
+pGreetings = pZeroOrMore pGreeting
+
+--Parses to the amount of greetings in a row
+pGreetingsN :: Parser Int
+pGreetingsN = length <$> pZeroOrMore pGreeting
+
