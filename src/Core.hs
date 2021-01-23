@@ -218,3 +218,60 @@ prntDefns dfns = sIntercalate sep (map prntDefn dfns)
 prntDefn :: (Name, CoreExpr) -> Seq
 prntDefn (name, expr) = sConcat [ sStr name, sStr " = ", sIndent (prntExpr expr)]
 
+
+
+---------------
+-- TOKENIZER --
+---------------
+
+--token string is never empty
+type Token = (LineNumber, String)
+
+type LineNumber = Int
+
+--lexical analysis
+tokens :: [Char] -> [Token] 
+tokens = tknRn 0
+
+--tokens func with line number
+tknRn :: LineNumber -> [Char] -> [Token] 
+tknRn l [] = []
+tknRn l (x:xs) 
+    | isNewl  x = tknRn (l + 1) xs      --ignore newline and increase line count
+    | isSpace x = tknRn l xs            --ignore whitespace
+    | isCChar x = tknRn l afterComment  --ignore comments 
+    | isParen x = (l, [x]) : tknRn l xs --tokenize parenthesis
+    | isDigit x = tokenWhile isDigit    --tokenize numbers
+    | isAlpha x = tokenWhile isIdChar   --tokenize identifiers
+    | isOper  x = tokenWhile isOper     --tokenize operators
+        where
+            tokenWhile f = tokenTake f : tknRn l (tokenDrop f)  --gets a token while f is true and prepends to the rest
+            tokenTake  f = (l, x : takeWhile f xs)              --gets a token while a condition started at x is true
+            tokenDrop  f =     dropWhile f xs                   --all text after the above token
+            afterComment = tokenDrop (not.isNewl)               --skips till newline
+
+
+isOper, isCChar, isIdChar, isParen, isNewl :: Char -> Bool
+isCChar   = (=='#')                                   --if the value is the comment character
+isOper x  = not (isParen x) && isSymbol x             --if value is operator token (symbol not parenthesis) 
+isIdChar  = matchAny [isAlpha, isNumber, (=='_')]     --if identifier character (alpha, number, or underscore)
+isParen   = matchAny [(=='('), (==')')]               --if the value is a parenthesis character
+isNewl = (=='\n')
+
+
+--point free match for the mems
+--match f cs val = f $ cs <*> pure val
+--match f c = f . flip map c . flip ($)
+--match f = (.) (f) . (flip (.) (flip ($)) . flip map)
+--match = (flip (.) (flip (.) (flip ($)) . flip map)) . (.)
+match :: ([Bool] -> Bool) -> [a -> Bool] -> a -> Bool
+match f cs val = f $ cs <*> pure val
+
+--returns true if value matches all conditions in the list
+matchAll :: [a -> Bool] -> a -> Bool
+matchAll = match and
+
+--returns true if value matches any conditions in the list
+matchAny :: [a -> Bool] -> a -> Bool
+matchAny = match or
+
