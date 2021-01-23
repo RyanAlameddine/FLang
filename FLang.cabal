@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: bf12474f5d4c3c1d4491592e90e06e8eb7d5858b1349809b9037a8bb6bd0c26d
+-- hash: d546d2d9d6cf543b211ee80b5c6cb7c974085a4264f3b5da2c6cee958e680480
 
 name:           FLang
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      Core
       Lib
   other-modules:
       Paths_FLang
