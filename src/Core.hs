@@ -1,24 +1,27 @@
+{-# LANGUAGE TupleSections #-}
+
 module Core where
 
 import Data.Char
 import Control.Monad
 import Control.Arrow
 import Control.Applicative
-import Text.Read
+import Text.Read (readMaybe)
 import Data.Maybe
+import Debug.Trace
 
 ------------------------
 -- LANGUAGE STRUCTURE --
 ------------------------
 
 data Expr a = 
-    EVar Name     -- Variable
+    EVar Name               -- Variable
     | ENum Int              -- Number
     | EConstr Int Int       -- Constructor: tag, arity
     | EAp (Expr a) (Expr a) -- Application
     | ELet                  -- Let(rec) expression
         IsRec               --   True=recursive
-        [(a, Expr a)]       --   Definitions
+        [Defn a]            --   Definitions
         (Expr a)            --   Expression Body
     | ECase                 -- Case expression
         (Expr a)            --   Expression being checked
@@ -37,32 +40,17 @@ type Name = String
 
 --Whether or not the let expression is recursive
 type IsRec = Bool
-recursive, nonRecursive :: IsRec
-recursive = True
-nonRecursive = False
+
+--Variable definition with name and expression value
+type Defn a   = (a, Expr a)
+type CoreDefn = Defn Name
 
 --Each definition is (variable name being bound, expression to which it is bound)
-
---picks out the list of variables bound by the definitions
-bindersOf :: [(a, b)] -> [a]
-bindersOf = map fst --bindersOf defns = [name | (name, rhs) <- defns]
-    
-
---extracts the list of right-hand sides to which they are bound
-rhssOf :: [(a, b)] -> [b]
-rhssOf = map snd --rhssOf defns = [rhs | (name, rhs) <- defns]
-
 
 --case expressions: expression to analyze and list of alternatives
 --each alternative has tag, bound variables, and expression to the right of the arrow
 type Alter a = (Int, [a], Expr a)
 type CoreAlt = Alter Name
-
---True if expression has no 'internal structure'
-isAtomicExpr :: Expr a -> Bool
-isAtomicExpr (EVar _) = True
-isAtomicExpr (ENum _) = True
-isAtomicExpr _        = False
 
 type Program a = [ScDefn a]
 type CoreProgram = Program Name
@@ -71,13 +59,33 @@ type CoreProgram = Program Name
 type ScDefn a = (Name, [a], Expr a)
 type CoreScDefn = ScDefn Name
 
+recursive, nonRecursive :: IsRec
+recursive = True
+nonRecursive = False
+
+--True if expression has no 'internal structure'
+isAtomicExpr :: Expr a -> Bool
+isAtomicExpr (EVar _) = True
+isAtomicExpr (ENum _) = True
+isAtomicExpr _        = False
+
+--picks out the list of variables bound by the definitions
+bindersOf :: [(a, b)] -> [a]
+bindersOf = map fst 
+    
+--extracts the list of right-hand sides to which they are bound
+rhssOf :: [(a, b)] -> [b]
+rhssOf = map snd 
+
+--PRELUDE DEFINITIONS
+
 preludeDefs :: CoreProgram
-preludeDefs = [ ("id", ["x"], EVar "x"), -- id x = x ;
-                ("K" , ["x", "y"], EVar "x"), -- K x y = x ;
-                ("K1", ["x", "y"], EVar "y"), -- K1 x y = y ;
-                ("S" , ["f", "g", "x"], EAp (EAp (EVar "f") (EVar "x")) (EAp (EVar "g") (EVar "x"))), -- S f g x = (f x) (g x) ;
-                ("compose", ["f", "g", "x"], EAp (EVar "f") (EAp (EVar "g") (EVar "x"))), -- compose f g x = f (g x) ;
-                ("twice"  , ["f"], EAp (EAp (EVar "compose") (EVar "f")) (EVar "f")) ] -- compose f f ;
+preludeDefs = [ ("id", ["x"], EVar "x"),        -- id x = x ;
+                ("K" , ["x", "y"], EVar "x"),   -- K x y = x ;
+                ("K1", ["x", "y"], EVar "y"),   -- K1 x y = y ;
+                ("S" , ["f", "g", "x"], EAp (EAp (EVar "f") (EVar "x")) (EAp (EVar "g") (EVar "x"))),   -- S f g x = (f x) (g x) ;
+                ("compose", ["f", "g", "x"], EAp (EVar "f") (EAp (EVar "g") (EVar "x"))),               -- compose f g x = f (g x) ;
+                ("twice"  , ["f"], EAp (EAp (EVar "compose") (EVar "f")) (EVar "f")) ]                  -- twice f = compose f f ;
 
 
 --pprint :: CoreProgram -> String
@@ -104,6 +112,7 @@ data Seq = SNil
         | SAppend Seq Seq
         | SIndent Seq
         | SNewline
+        deriving Show
 
 
 sNil :: Seq
@@ -126,7 +135,7 @@ sSpace :: Int -> Seq
 sSpace = sStr . flip replicate ' '
 
 sConcat :: [Seq] -> Seq
-sConcat = foldl1 sAppend 
+sConcat = foldl sAppend SNil
 
 sIntercalate :: Seq -> [Seq] -> Seq
 sIntercalate _ [] = sNil
@@ -143,10 +152,10 @@ sLayn = sConcat . zipWith line [1..]
     where line i seq = sConcat [sNum i, sStr ". ", sIndent seq, sNewline] 
 
 flatten :: Int -> [(Seq, Int)] -> String
-flatten col ((SNewline     , i) : seqs) = '\n' : replicate i ' ' ++ flatten i seqs    --newLine and add indent
-flatten col ((SIndent seq  , _) : seqs) = flatten col ((seq, col) : seqs)             --set indent (doesnt update string)
-flatten col ((SStr s       , _) : seqs) = s ++ flatten col seqs                       --prepend string to next
-flatten col ((SAppend s1 s2, _) : seqs) = flatten col ((s1, col):(s2, col):seqs)      --flatten tree to list
+flatten col ((SNewline     , i) : seqs) = '\n' : replicate i ' ' ++ flatten i seqs  --newLine and add indent
+flatten col ((SIndent seq  , _) : seqs) = flatten col ((seq, col) : seqs)           --set indent (doesnt update string)
+flatten col ((SStr s       , i) : seqs) = s ++ flatten (col + length s) seqs        --prepend string to next
+flatten col ((SAppend s1 s2, i) : seqs) = flatten col ((s1, i):(s2, i):seqs)        --flatten tree to list
 flatten _ _ = []
 
 --flatten [] = ""
@@ -161,6 +170,7 @@ sDisplay x = flatten 0 [(x, 0)]
 -- PRETTY PRINTER --
 --------------------
 
+prnt :: CoreProgram -> String
 prnt = sDisplay . prntProg
 
 --prints out program
@@ -181,15 +191,17 @@ prntArgs = foldr cncat sNil
 --prints out expression
 prntExpr :: CoreExpr -> Seq
 prntExpr (EVar e)    = sStr e
-prntExpr (ENum e)    = sStr (show e)
+prntExpr (ENum e)    = sStr $ show e
+prntExpr (EAp (EAp (EVar op) e1) e2)
+    | head op `elem` opChars = sConcat[sStr "(", prntExpr e1, sStr $ " " ++ op ++ " ", prntAExpr e2, sStr ")"]
 prntExpr (EAp e1 e2) = sConcat [ prntExpr e1, sStr " ", prntAExpr e2 ]
 prntExpr (ELet r dfns e) = sConcat [
         sStr (if r then "reclet" else "let"), sNewline, -- "let" or "reclet"
         sStr " ", sIndent (prntDefns dfns), sNewline, -- definintions
         sStr "in ", prntExpr e ] -- "in" {expressions}
-prntExpr (ECase expr alters)
-  = sConcat [ sStr "case ", sIndent (prntExpr expr), sStr " of", sNewline, -- case expr of 
-              foldr cncat sNil alters ] --all the alternatives
+prntExpr (ECase expr alters) = sConcat [ 
+        sStr "case ", sIndent (prntExpr expr), sStr " of", sNewline, -- case expr of 
+        foldr cncat sNil alters ] --all the alternatives
     where
       cncat x xs = sConcat [sIndent (prntAlter x), sNewline, xs]
 
@@ -202,7 +214,7 @@ prntAExpr e
 
 prntAlter :: CoreAlt -> Seq
 prntAlter (tag, vars, expr) = sConcat [
-        sStr (show "<" ++ show tag ++ ">: "), 
+        sStr ("<" ++ show tag ++ ">: "), 
         chng vars, 
         sStr " -> ", 
         sIndent(prntExpr expr) ]
@@ -244,6 +256,7 @@ tknRn l (x:xs)
     | isDigit x = tokenWhile isDigit    --tokenize numbers
     | isAlpha x = tokenWhile isIdChar   --tokenize identifiers
     | isOper  x = tokenWhile isOper     --tokenize operators
+    | otherwise = error $ show x
         where
             tokenWhile f = tokenTake f : tknRn l (tokenDrop f)  --gets a token while f is true and prepends to the rest
             tokenTake  f = (l, x : takeWhile f xs)              --gets a token while a condition started at x is true
@@ -252,11 +265,11 @@ tknRn l (x:xs)
 
 
 isOper, isCChar, isIdChar, isParen, isNewl :: Char -> Bool
-isCChar   = (=='#')                                   --if the value is the comment character
-isOper x  = not (isParen x) && isSymbol x             --if value is operator token (symbol not parenthesis) 
-isIdChar  = matchAny [isAlpha, isNumber, (=='_')]     --if identifier character (alpha, number, or underscore)
-isParen   = matchAny [(=='('), (==')')]               --if the value is a parenthesis character
-isNewl = (=='\n')
+isNewl    = (=='\n')                                --if a newline character
+isCChar   = (=='#')                                 --if the comment character
+isParen   = matchAny [(=='('), (==')')]             --if a parenthesis character
+isIdChar  = matchAny [isAlpha, isNumber, (=='_')]   --if part of an identifier (alpha, number, or underscore)
+isOper    = (`elem` opChars)                          --if an operator token (symbol not parenthesis) 
 
 
 --point free match for the mems
@@ -319,7 +332,7 @@ pLit :: String -> Parser String
 pLit = pSat . (==)
 
 --parses a variable identifier
-pVar :: Parser String
+pVar :: Parser Name
 pVar = pSat check
     where
         --starts with alphanumeric and is not a keyword
@@ -348,16 +361,31 @@ pOneOrMoreSep a b = do
                 val    <- a             --check for a
                 others <- pre           --check for all the other b-a
                 return $ val : others   --return a:others
-    where pre = do 
+    where pre = return [] <|> do 
             _   <- b                    --check for b and discard result
-            val <- a                    --check for a
-            others <- return [] <|> pre --check if zero or more
+            val <- a                    --check for al
+            others <- pre --check if zero or more
             return $ val : others       --return a:others
+{-# ANN pOneOrMoreSep ("HLint: ignore Reduce duplication" :: String) #-}
+
+-- pOneOrMoreSep :: Parser a -> Parser s -> Parser [a]
+-- pOneOrMoreSep a s = 
+
+--applies alternative (<|>) to each parser in order
+pAnyOf :: [Parser a] -> Parser a
+pAnyOf = foldl1 (<|>)
 
 --returns a parser which only returns the last element
 --fmapLast f = undefined
 
---liftM2 runs parser a, then parser b, then returns f a b which is c
+--runs parsers in sequence and returns tuple of all results
+pair2 :: Applicative f => f a -> f b -> f (a, b)
+pair2 a b = (,) <$> a <*> b
+
+pair3 :: Applicative f => f a -> f b -> f c -> f (a, b, c)
+pair3 a b c = (,,) <$> a <*> b <*> c
+
+--example parsers
 
 --hello or goodbye
 pHelloOrGoodbye :: Parser String
@@ -365,7 +393,7 @@ pHelloOrGoodbye = pLit "hello" <|> pLit "goodbye"
 
 --hello or goodbye followed by a variable name
 pGreeting :: Parser (String, String)
-pGreeting = liftM2 (,) pHelloOrGoodbye pVar
+pGreeting = pair2 pHelloOrGoodbye pVar
 
 --zero or more greetings
 pGreetings :: Parser [(String, String)]
@@ -375,3 +403,169 @@ pGreetings = pZeroOrMore pGreeting
 pGreetingsN :: Parser Int
 pGreetingsN = length <$> pZeroOrMore pGreeting
 
+sampleTokensG :: [Token]
+sampleTokensG = map f ["hello", ".", "hello", "Johnny", "Boy", "!"]
+    where
+        f str = (0, str)
+
+-----------------
+-- CORE PARSER --
+-----------------
+
+syntax :: [Token] -> CoreProgram
+syntax ts= (takeFirst . runParser pProgram) ts
+    where 
+        takeFirst ((prog,[]) : others) = prog
+        takeFirst (parse     : others) = takeFirst others
+        takeFirst other                = error ("Syntax error" ++ show (runParser pProgram ts)) --TODO: Add line column?
+
+--IMPORTANT NOTE:
+--All parser below are simply transliterations of the language grammar (found in ./BNFSyntax.png or ./README.md):
+
+--parses [supercombinators] from program
+pProgram :: Parser CoreProgram
+pProgram = pOneOrMoreSep pSc (pLit ";")
+
+--parses (functionName, [variable names], expression) from "functionName var1 var2 var3 = expression"
+pSc :: Parser CoreScDefn
+pSc = pair3 pVar (pZeroOrMore pVar) (pLit "=" *> pExpr)
+
+--parses an expression into a CoreExpr
+-- pExpr :: Parser CoreExpr
+-- pExpr = pAnyOf [application, infixApp, letDef, letRecDef, caseDef, lambda, pAExpr]
+--     where
+--         letPattern :: IsRec -> String -> Parser (Expr Name)
+--         letPattern isRec letStr = liftM2 (ELet isRec) (pLit letStr *> pDefns) (pLit "in" *> pExpr)
+
+--         application, infixApp, letDef, letRecDef, caseDef, lambda :: Parser CoreExpr
+--         application = liftM2 EAp pExpr pAExpr           -- func expr -> EAp (func expr)
+--         infixApp    = liftM3 ifx pExpr pBinop pExpr     -- a * b     -> EAp (EAp (EVar "*") a) b
+--             where ifx p1 op = EAp (EAp (EVar op) p1)
+--         letDef      = letPattern False "let"            -- let x = 5 in f    -> ELet False [("x", 5)] f
+--         letRecDef   = letPattern True  "letrec"         -- letrec x = 5 in f -> ELet True  [("x", 5)] f
+--         caseDef     = liftM2 ECase cs pAlts             -- case x of cases   -> ECase PVar("x") [alts]
+--             where cs = pLit "case" *> pExpr <* pLit "of" 
+--         lambda      = liftM2 Elam (pOneOrMore pVar) lm  -- \x y = expr -> Elam ["x", "y"] expr
+--             where lm = pLit "." *> pExpr
+
+-- expr -> expr aexpr is left recursive :(
+-- expr -> aexpr1 ... aexprn (n >= 1)
+
+
+--parses an expression into a CoreExpr
+-- pExpr :: Parser CoreExpr
+-- pExpr = pAnyOf [letDef, letRecDef, caseDef, lambda, pExpr1]
+--     where
+--         letPattern :: IsRec -> String -> Parser (Expr Name)
+--         letPattern isRec letStr = liftM2 (ELet isRec) (pLit letStr *> pDefns) (pLit "in" *> pExpr)
+
+--         letDef, letRecDef, caseDef, lambda :: Parser CoreExpr
+--         letDef      = letPattern False "let"            -- let x = 5 in f    -> ELet False [("x", 5)] f
+--         letRecDef   = letPattern True  "letrec"         -- letrec x = 5 in f -> ELet True  [("x", 5)] f
+--         caseDef     = liftM2 ECase cs pAlts             -- case x of cases   -> ECase PVar("x") [alts]
+--             where cs = pLit "case" *> pExpr <* pLit "of" 
+--         lambda      = liftM2 Elam (pOneOrMore pVar) lm  -- \x y = expr -> Elam ["x", "y"] expr
+--             where lm = pLit "." *> pExpr
+
+pLet :: IsRec -> String -> Parser (Expr Name) -- letExpr
+pLet isRec letStr = liftM2 (ELet isRec) (pLit letStr *> pDefns) (pLit "in" *> pExpr)
+
+pCase :: Parser CoreExpr --caseExpr
+pCase = liftM2 ECase cs pAlts 
+    where cs = pLit "case" *> pExpr <* pLit "of" 
+
+pLam :: Parser CoreExpr --lambda
+pLam  = liftM2 Elam (pOneOrMore pVar) lm
+    where lm = pLit "." *> pExpr
+
+pDefns :: Parser [CoreDefn]
+pDefns = pOneOrMoreSep pDefn (pLit ";")
+
+pDefn :: Parser CoreDefn
+pDefn = pair2 pVar (pLit "=" *> pExpr)
+
+pAlts :: Parser [CoreAlt]
+pAlts = pOneOrMoreSep pAlt (pLit ";")
+
+pAlt :: Parser CoreAlt
+pAlt = pair3 cnum cvars pExpr
+    where
+        cnum  = pLit "<" *> pNum <* pLit ">"
+        cvars = pZeroOrMore pVar <* pLit "->"
+
+
+data PartialExpr = NoOp | Op Name CoreExpr
+
+--Represents an operator and the expression on the right
+mkOp :: Parser Name -> Parser CoreExpr -> Parser PartialExpr
+mkOp = liftA2 Op
+
+--Applies the infix operator to the adjacent expressions
+assembleOp :: Parser CoreExpr -> Parser PartialExpr -> Parser CoreExpr
+assembleOp = liftA2 asmblOp
+    where
+        asmblOp :: CoreExpr -> PartialExpr -> CoreExpr
+        asmblOp e1 NoOp = e1
+        asmblOp e1 (Op op e2) = EAp (EAp (EVar op) e1) e2
+
+--EXPR PARSERS BEGIN
+
+pExpr :: Parser CoreExpr
+pExpr = pAnyOf [pLet False "let", pLet True "letrec", pCase, pLam, pExpr1]
+
+--Gets a layer of the language grammar that represents a precedence order
+--The first param is the next parser to be checked if this fails
+--The second is a list of ("operator", expression on the right) for all
+--expressions at this level of precedence
+pExprLayer :: Parser CoreExpr -> [(Name, Parser CoreExpr)] -> Parser CoreExpr
+pExprLayer next partials = assembleOp next (pPartial partials) -- <|> next
+    where
+        pPartial :: [(Name, Parser CoreExpr)] -> Parser PartialExpr
+        pPartial strs = pAnyOf $ pure NoOp:map (uncurry (mkOp . pLit)) strs
+
+pExpr1 = pExprLayer pExpr2 [("|", pExpr1)]
+pExpr2 = pExprLayer pExpr3 [("&", pExpr2)]
+pExpr3 = pExprLayer pExpr4 $ map (,pExpr4) relOps
+pExpr4 = pExprLayer pExpr5 [("+", pExpr4), ("-", pExpr5)]
+pExpr5 = pExprLayer pExpr6 [("*", pExpr5), ("/", pExpr6)]
+
+pExpr6 :: Parser CoreExpr
+pExpr6 = fmap (foldr1 EAp) (pOneOrMore pAExpr)
+
+pAExpr :: Parser CoreExpr
+pAExpr = pAnyOf [EVar <$> pVar, ENum <$> pNum, pConst, pParenExpr]
+    where
+        pConst = liftA2 EConstr (pLit "Pack{" *> pNum) (pNum <* pLit "}")
+        pParenExpr = pLit "(" *> pExpr <* pLit ")"
+
+--EXPR PARSERS END
+
+-- pBinop :: Parser Name
+-- pBinop = pAnyOf [arithOps, relOps, boolOps]
+
+opChars  = ';':map head (arithOps ++ relOps ++ boolOps)
+arithOps = ["+", "-", "*", "/"]
+relOps   = ["<", "<=", "==", ">=", ">"]
+boolOps  = ["&", "|"]
+-- turns each string to a parser, then runs pAnyOf
+--transform = pAnyOf . map pLit
+
+keywords :: [String]
+keywords = ["let", "letrec", "case", "in", "of", "Pack"]
+
+sampleProgram :: String
+sampleProgram = "f = 3 ;\
+\g x y = let z = x in z ;\
+\h x = case let y = x in y of\
+\       <1> -> 2 ;\
+\       <2> -> 5 ;\
+\f2 x y = case x of \
+\       <1> -> case y of\
+\           <1> -> 1 ; \
+\       <2> -> 2 ; \
+\div x y = x / (y * x) + ((y - y) - x)"
+
+sampleTokens :: [Token]
+sampleTokens = tokens sampleProgram
+
+testFunc = runParser (pLit "test" <|> pLit "hmm")

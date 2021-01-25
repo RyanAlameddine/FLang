@@ -67,7 +67,8 @@ pSat f = Parser satisfy
         satisfy _ = []
 ```
 
-Parser examples:
+A parser combinator library is built off of this satisfy function. Here are some sample parsers:
+
 ```haskell
 
 --takes in a string and returns a parser which parses that literal
@@ -99,23 +100,42 @@ pOneOrMore p = do
             return $ val : others
 ```            
 
+<img src="/BNFSyntax.png" width=500> 
+
+To solve the issues with left recursion (and implement operator precedence), this grammar is updated to the following:
+
+<img src="/ExprSyntax.png" width=300> 
+
 After these basic parsers are defined, all other parsers are just simple transliteration of the language syntax (using simple function composition):
 
-<img src="https://github.com/RyanAlameddine/FLang/blob/main/BNFSyntax.png" width=800> 
+```haskell
+pProgram :: Parser CoreProgram
+pProgram = pOneOrMoreSep pScDefn (pLit ";")
 
-Operator precedence is also defined as follows:
+pSc :: Parser CoreScDefn
+pSc = pair3 pVar (pZeroOrMore pVar) (pLit "=" *> pExpr)
 
-| Precedence | Associativity | Operator |
-| --- | --- | --- |
-| 6 | Left  | Application |
-| 5 | Right | * |
-|   | None  | / |
-| 4 | Right | + |
-|   | None  | - |
-| 3 | None  | == ~= > >= < <= |
-| 2 | Right | & |
-| 1 | Right | \| |
+pExpr1 = pExprLayer pExpr2 [("|", pExpr1)]
+pExpr2 = pExprLayer pExpr3 [("&", pExpr2)]
+pExpr3 = pExprLayer pExpr4 $ map (,pExpr4) relOps
+pExpr4 = pExprLayer pExpr5 [("+", pExpr4), ("-", pExpr5)]
+pExpr5 = pExprLayer pExpr6 [("*", pExpr5), ("/", pExpr6)]
 
+pDefns :: Parser [CoreDefn]
+pDefns = pOneOrMoreSep pDefn (pLit ";")
+
+pDefn :: Parser CoreDefn
+pDefn = pair2 pVar (pLit "=" *> pExpr)
+
+pAlts :: Parser [CoreAlt]
+pAlts = pOneOrMoreSep pAlt (pLit ";")
+
+pAlt :: Parser CoreAlt
+pAlt = pair3 cnum cvars pExpr
+    where
+        cnum  = pLit "<" *> pNum <* pLit ">"
+        cvars = pZeroOrMore pVar <* pLit "->"
+```
 
 ## Internal Representation
 
@@ -136,7 +156,7 @@ data Expr a =
     | EAp (Expr a) (Expr a) -- Application
     | ELet                  -- Let(rec) expression
         IsRec               --   True=recursive
-        [(a, Expr a)]       --   Definitions
+        [Defn]              --   Definitions
         (Expr a)            --   Expression Body
     | ECase                 -- Case expression
         (Expr a)            --   Expression being checked
@@ -146,10 +166,19 @@ data Expr a =
 
 type CoreExpr = Expr Name 
 
+type Name = String
+
+type IsRec = Bool
+
+--(variable name being bound, expression to which it is bound)
+type Defn a = (a, Expr a)
+type CoreDefn = Defn Name
+
 --case expressions: expression to analyze and list of alternatives
 --each alternative has tag, bound variables, and expression to the right of the arrow
 type Alter a = (Int, [a], Expr a)
 type CoreAlt = Alter Name
+
 ```
     
 ## FLang Prelude
