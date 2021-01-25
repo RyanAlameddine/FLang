@@ -17,14 +17,14 @@ tokens :: String -> [Token]
 
 The tokens function performs a lexical analysis on the input string and returns a list of tokens based upon their conformity to the following patterns:
 ```haskell
-isNewl    = (=='\n')                                --if a newline character
-isSpace   = isSpace                                 --if a whitespace char
-isCChar   = (=='#')                                 --if the comment character
-isParen   = matchAny [(=='('), (==')')]             --if a parenthesis character
-isDigit   = isDigit                                 --if a digit
-isAlpha   = isAlpha                                 --if an letter of the alphabet
-isIdChar  = matchAny [isAlpha, isNumber, (=='_')]   --if part of an identifier (alpha, number, or underscore)
-isOper x  = not (isParen x) && isSymbol x           --if an operator token (symbol not parenthesis) 
+isNewl    = (=='\n')                               --if a newline character
+isSpace   = isSpace                                --if a whitespace char
+isCChar   = (=='#')                                --if the comment character
+isParen   = matchAny [(=='('), (==')')]            --if a parenthesis character
+isDigit   = isDigit                                --if a digit
+isAlpha   = isAlpha                                --if an letter of the alphabet
+isIdChar  = matchAny [isAlpha, isNumber, (=='_')]  --if part of an identifier (alpha, number, or underscore)
+isOper x  = not (isParen x) && isSymbol x          --if an operator token (symbol not parenthesis) 
 ```
 
 ### 2. Parsing
@@ -32,7 +32,8 @@ isOper x  = not (isParen x) && isSymbol x           --if an operator token (symb
 The Monad Parser is defined as follows:
 
 ```haskell
---Returns a list of (output, remaining tokens) which represents list of all possible parses (ambiguities to be collapsed)
+--Returns a list of (output, remaining tokens) which represents
+--the list of all possible parses (ambiguities to be collapsed)
 newtype Parser a = Parser { runParser :: [Token] -> [(a, [Token])] }
 
 instance Functor Parser where
