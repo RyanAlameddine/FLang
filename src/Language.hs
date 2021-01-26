@@ -1,13 +1,4 @@
-module Core where
-
-import Data.Char
-import Control.Monad
-import Control.Arrow
-import Control.Applicative
-import Text.Read (readMaybe)
-import Data.Maybe
-import Debug.Trace
-import ParserCombinator
+module Language where
 
 ------------------------
 -- LANGUAGE STRUCTURE --

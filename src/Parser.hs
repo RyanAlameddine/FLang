@@ -1,7 +1,7 @@
 {-# LANGUAGE TupleSections #-}
 module Parser where
 
-import Core
+import Language
 import ParserCombinator
 import Control.Applicative
 import Control.Monad

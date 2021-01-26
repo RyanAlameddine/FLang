@@ -1,6 +1,6 @@
 module PPrinter where
 
-import Core
+import Language
 import Seq
 
 --BAD PRETTY PRINTER CODE

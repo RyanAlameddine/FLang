@@ -1,6 +1,6 @@
 module Compiler where
 
-import Core
+import Language
 import ParserCombinator
 import Parser
 import Tokenizer

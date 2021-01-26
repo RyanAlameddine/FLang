@@ -1,6 +1,6 @@
 module Tokenizer where
 
-import Core
+import Language
 import ParserCombinator
 import Data.Char
 
