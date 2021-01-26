@@ -4,8 +4,6 @@ FLang is a low(ish)-level functional programming language designed (by me) and i
 
 ## Parser
 
-
-
 ### 1. Tokenization
 
 ```haskell
@@ -29,7 +27,7 @@ isOper x  = not (isParen x) && isSymbol x          --if an operator token (symbo
 
 ### 2. Parsing
 
-The Monad Parser is defined as follows:
+The monadic parser combinator is defined as follows:
 
 ```haskell
 --Returns a list of (output, remaining tokens) which represents
