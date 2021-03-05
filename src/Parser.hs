@@ -2,10 +2,32 @@
 module Parser where
 
 import Language
+import Tokenizer
 import ParserCombinator
 import Control.Applicative
 import Control.Monad
 import Data.Char
+
+parse :: String -> CoreProgram --main parsing function
+parse = syntax . tokens
+
+
+sampleProgram :: String
+sampleProgram = "f = 3 ;\
+\g x y = let z = x in z ;\
+\h x = case let y = x in y of\
+\       <1> -> 2 ;\
+\       <2> -> 5 ;\
+\f2 x y = case x of \
+\       <1> -> case y of\
+\           <1> -> 1 ; \
+\       <2> -> 2 ; \
+\div x y = x / (y * x) + ((y - y) - x)"
+
+sampleTokens :: [Token]
+sampleTokens = tokens sampleProgram
+
+testFunc = runParser (pLit "test" <|> pLit "hmm")
 
 -----------------
 -- CORE PARSER --
@@ -28,43 +50,6 @@ pProgram = pOneOrMoreSep pSc (pLit ";")
 --parses (functionName, [variable names], expression) from "functionName var1 var2 var3 = expression"
 pSc :: Parser CoreScDefn
 pSc = pair3 pVar (pZeroOrMore pVar) (pLit "=" *> pExpr)
-
---parses an expression into a CoreExpr
--- pExpr :: Parser CoreExpr
--- pExpr = pAnyOf [application, infixApp, letDef, letRecDef, caseDef, lambda, pAExpr]
---     where
---         letPattern :: IsRec -> String -> Parser (Expr Name)
---         letPattern isRec letStr = liftM2 (ELet isRec) (pLit letStr *> pDefns) (pLit "in" *> pExpr)
-
---         application, infixApp, letDef, letRecDef, caseDef, lambda :: Parser CoreExpr
---         application = liftM2 EAp pExpr pAExpr           -- func expr -> EAp (func expr)
---         infixApp    = liftM3 ifx pExpr pBinop pExpr     -- a * b     -> EAp (EAp (EVar "*") a) b
---             where ifx p1 op = EAp (EAp (EVar op) p1)
---         letDef      = letPattern False "let"            -- let x = 5 in f    -> ELet False [("x", 5)] f
---         letRecDef   = letPattern True  "letrec"         -- letrec x = 5 in f -> ELet True  [("x", 5)] f
---         caseDef     = liftM2 ECase cs pAlts             -- case x of cases   -> ECase PVar("x") [alts]
---             where cs = pLit "case" *> pExpr <* pLit "of" 
---         lambda      = liftM2 Elam (pOneOrMore pVar) lm  -- \x y = expr -> Elam ["x", "y"] expr
---             where lm = pLit "." *> pExpr
-
--- expr -> expr aexpr is left recursive :(
--- expr -> aexpr1 ... aexprn (n >= 1)
-
-
---parses an expression into a CoreExpr
--- pExpr :: Parser CoreExpr
--- pExpr = pAnyOf [letDef, letRecDef, caseDef, lambda, pExpr1]
---     where
---         letPattern :: IsRec -> String -> Parser (Expr Name)
---         letPattern isRec letStr = liftM2 (ELet isRec) (pLit letStr *> pDefns) (pLit "in" *> pExpr)
-
---         letDef, letRecDef, caseDef, lambda :: Parser CoreExpr
---         letDef      = letPattern False "let"            -- let x = 5 in f    -> ELet False [("x", 5)] f
---         letRecDef   = letPattern True  "letrec"         -- letrec x = 5 in f -> ELet True  [("x", 5)] f
---         caseDef     = liftM2 ECase cs pAlts             -- case x of cases   -> ECase PVar("x") [alts]
---             where cs = pLit "case" *> pExpr <* pLit "of" 
---         lambda      = liftM2 Elam (pOneOrMore pVar) lm  -- \x y = expr -> Elam ["x", "y"] expr
---             where lm = pLit "." *> pExpr
 
 pLet :: IsRec -> String -> Parser (Expr Name) -- letExpr
 pLet isRec letStr = liftM2 (ELet isRec) (pLit letStr *> pDefns) (pLit "in" *> pExpr)
@@ -136,7 +121,7 @@ pExpr4 = pExprLayer pExpr5 [("+", pExpr4), ("-", pExpr5)]
 pExpr5 = pExprLayer pExpr6 [("*", pExpr5), ("/", pExpr6)]
 
 pExpr6 :: Parser CoreExpr
-pExpr6 = fmap (foldr1 EAp) (pOneOrMore pAExpr)
+pExpr6 = fmap (foldl1 EAp) (pOneOrMore pAExpr)
 
 pAExpr :: Parser CoreExpr
 pAExpr = pAnyOf [EVar <$> pVar, ENum <$> pNum, pConst, pParenExpr]
@@ -145,3 +130,42 @@ pAExpr = pAnyOf [EVar <$> pVar, ENum <$> pNum, pConst, pParenExpr]
         pParenExpr = pLit "(" *> pExpr <* pLit ")"
 
 --EXPR PARSERS END
+
+--deprecated:
+
+--parses an expression into a CoreExpr
+-- pExpr :: Parser CoreExpr
+-- pExpr = pAnyOf [application, infixApp, letDef, letRecDef, caseDef, lambda, pAExpr]
+--     where
+--         letPattern :: IsRec -> String -> Parser (Expr Name)
+--         letPattern isRec letStr = liftM2 (ELet isRec) (pLit letStr *> pDefns) (pLit "in" *> pExpr)
+
+--         application, infixApp, letDef, letRecDef, caseDef, lambda :: Parser CoreExpr
+--         application = liftM2 EAp pExpr pAExpr           -- func expr -> EAp (func expr)
+--         infixApp    = liftM3 ifx pExpr pBinop pExpr     -- a * b     -> EAp (EAp (EVar "*") a) b
+--             where ifx p1 op = EAp (EAp (EVar op) p1)
+--         letDef      = letPattern False "let"            -- let x = 5 in f    -> ELet False [("x", 5)] f
+--         letRecDef   = letPattern True  "letrec"         -- letrec x = 5 in f -> ELet True  [("x", 5)] f
+--         caseDef     = liftM2 ECase cs pAlts             -- case x of cases   -> ECase PVar("x") [alts]
+--             where cs = pLit "case" *> pExpr <* pLit "of" 
+--         lambda      = liftM2 Elam (pOneOrMore pVar) lm  -- \x y = expr -> Elam ["x", "y"] expr
+--             where lm = pLit "." *> pExpr
+
+-- expr -> expr aexpr is left recursive :(
+-- expr -> aexpr1 ... aexprn (n >= 1)
+
+
+--parses an expression into a CoreExpr
+-- pExpr :: Parser CoreExpr
+-- pExpr = pAnyOf [letDef, letRecDef, caseDef, lambda, pExpr1]
+--     where
+--         letPattern :: IsRec -> String -> Parser (Expr Name)
+--         letPattern isRec letStr = liftM2 (ELet isRec) (pLit letStr *> pDefns) (pLit "in" *> pExpr)
+
+--         letDef, letRecDef, caseDef, lambda :: Parser CoreExpr
+--         letDef      = letPattern False "let"            -- let x = 5 in f    -> ELet False [("x", 5)] f
+--         letRecDef   = letPattern True  "letrec"         -- letrec x = 5 in f -> ELet True  [("x", 5)] f
+--         caseDef     = liftM2 ECase cs pAlts             -- case x of cases   -> ECase PVar("x") [alts]
+--             where cs = pLit "case" *> pExpr <* pLit "of" 
+--         lambda      = liftM2 Elam (pOneOrMore pVar) lm  -- \x y = expr -> Elam ["x", "y"] expr
+--             where lm = pLit "." *> pExpr

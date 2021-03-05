@@ -1,0 +1,69 @@
+2021-03-03 20:09:21.293529900000 [$pid(ThreadId 5)] ERROR APP - user error (loaded module can not find from path. <c:\Users\rhala\Code\FLang\src\TiMachine.hs> [("Main","C:/Users/rhala/Code/FLang/test/Spec.hs")])
+2021-03-03 20:09:23.184178000000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 20:09:58.217840200000 [$pid(ThreadId 5)] ERROR APP - user error (loaded module can not find from path. <c:\Users\rhala\Code\FLang\src\TiMachine.hs> [("Main","C:/Users/rhala/Code/FLang/test/Spec.hs")])
+2021-03-03 20:09:59.822959500000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 20:10:21.636139400000 [$pid(ThreadId 5)] ERROR APP - user error (loaded module can not find from path. <c:\Users\rhala\Code\FLang\src\TiMachine.hs> [("Main","C:/Users/rhala/Code/FLang/test/Spec.hs")])
+2021-03-03 20:10:23.276770700000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 20:13:05.912168100000 [$pid(ThreadId 5)] ERROR APP - user error (loaded module can not find from path. <c:\Users\rhala\Code\FLang\src\Lib.hs> [("Main","C:/Users/rhala/Code/FLang/test/Spec.hs")])
+2021-03-03 20:13:05.929166500000 [$pid(ThreadId 5)] ERROR APP - user error (loaded module can not find from path. <c:\Users\rhala\Code\FLang\src\TiMachine.hs> [("Main","C:/Users/rhala/Code/FLang/test/Spec.hs")])
+2021-03-03 20:13:07.544285500000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 20:14:13.063826700000 [$pid(ThreadId 5)] ERROR APP - user error (loaded module can not find from path. <c:\Users\rhala\Code\FLang\test\Spec.hs> [("Language","C:\\Users\\rhala\\Code\\FLang\\src\\Language.hs"),("Utils","C:\\Users\\rhala\\Code\\FLang\\src\\Utils.hs")])
+2021-03-03 20:14:13.080830000000 [$pid(ThreadId 5)] ERROR APP - user error (loaded module can not find from path. <c:\Users\rhala\Code\FLang\src\TiMachine.hs> [("Language","C:\\Users\\rhala\\Code\\FLang\\src\\Language.hs"),("Utils","C:\\Users\\rhala\\Code\\FLang\\src\\Utils.hs")])
+2021-03-03 20:14:13.120831100000 [$pid(ThreadId 5)] ERROR APP - start debugging failed. user error (ExecResult not found.) : Left "user error (ExecResult not found.)"
+2021-03-03 20:14:47.776146400000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 20:19:51.971336400000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 20:23:33.601963800000 [$pid(ThreadId 5)] ERROR APP - user error (no stacktrace found.)
+2021-03-03 20:23:45.783531800000 [$pid(ThreadId 5)] ERROR APP - user error (ExecResult not found.)
+2021-03-03 20:23:48.729752500000 [$pid(ThreadId 5)] ERROR APP - user error (ExecResult not found.)
+2021-03-03 20:23:52.315037100000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 20:24:31.249688500000 [$pid(ThreadId 5)] ERROR APP - user error (no stacktrace found.)
+2021-03-03 20:24:33.764384300000 [$pid(ThreadId 5)] ERROR APP - user error (ExecResult not found.)
+2021-03-03 20:24:34.513439900000 [$pid(ThreadId 5)] ERROR APP - user error (ExecResult not found.)
+2021-03-03 20:24:34.878463400000 [$pid(ThreadId 5)] ERROR APP - user error (ExecResult not found.)
+2021-03-03 20:24:35.515017100000 [$pid(ThreadId 5)] ERROR APP - user error (ExecResult not found.)
+2021-03-03 20:24:36.516091400000 [$pid(ThreadId 5)] ERROR APP - user error (ExecResult not found.)
+2021-03-03 20:28:53.936012200000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 20:29:58.531501200000 [$pid(ThreadId 5)] ERROR APP - user error (no stacktrace found.)
+2021-03-03 20:57:46.057957600000 [$pid(ThreadId 5)] ERROR APP - start debugging failed. user error (ExecResult not found.) : Left "user error (ExecResult not found.)"
+2021-03-03 20:57:58.768422300000 [$pid(ThreadId 5)] ERROR APP - start debugging failed. user error (ExecResult not found.) : Left "user error (ExecResult not found.)"
+2021-03-03 20:58:51.090832200000 [$pid(ThreadId 5)] ERROR APP - user error (ExecResult not found.)
+2021-03-03 21:02:07.095609500000 [$pid(ThreadId 5)] ERROR APP - user error (loaded module can not find from path. <c:\Users\rhala\Code\FLang\src\TiMachine.hs> [("Language","C:\\Users\\rhala\\Code\\FLang\\src\\Language.hs"),("Parser","C:\\Users\\rhala\\Code\\FLang\\src\\Parser.hs"),("ParserCombinator","C:\\Users\\rhala\\Code\\FLang\\src\\ParserCombinator.hs"),("Tokenizer","C:\\Users\\rhala\\Code\\FLang\\src\\Tokenizer.hs"),("Utils","C:\\Users\\rhala\\Code\\FLang\\src\\Utils.hs")])
+2021-03-03 21:02:07.240619600000 [$pid(ThreadId 5)] ERROR APP - start debugging failed. user error (ExecResult not found.) : Left "user error (ExecResult not found.)"
+2021-03-03 21:02:13.130583000000 [$pid(ThreadId 5)] ERROR APP - user error (loaded module can not find from path. <c:\Users\rhala\Code\FLang\src\TiMachine.hs> [("Language","C:\\Users\\rhala\\Code\\FLang\\src\\Language.hs"),("Parser","C:\\Users\\rhala\\Code\\FLang\\src\\Parser.hs"),("ParserCombinator","C:\\Users\\rhala\\Code\\FLang\\src\\ParserCombinator.hs"),("Tokenizer","C:\\Users\\rhala\\Code\\FLang\\src\\Tokenizer.hs"),("Utils","C:\\Users\\rhala\\Code\\FLang\\src\\Utils.hs")])
+2021-03-03 21:02:13.157586600000 [$pid(ThreadId 5)] ERROR APP - start debugging failed. user error (ExecResult not found.) : Left "user error (ExecResult not found.)"
+2021-03-03 21:02:17.591919600000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 21:02:24.046398200000 [$pid(ThreadId 5)] ERROR APP - user error (loaded module can not find from path. <c:\Users\rhala\Code\FLang\src\TiMachine.hs> [("Language","C:\\Users\\rhala\\Code\\FLang\\src\\Language.hs"),("Parser","C:\\Users\\rhala\\Code\\FLang\\src\\Parser.hs"),("ParserCombinator","C:\\Users\\rhala\\Code\\FLang\\src\\ParserCombinator.hs"),("Tokenizer","C:\\Users\\rhala\\Code\\FLang\\src\\Tokenizer.hs"),("Utils","C:\\Users\\rhala\\Code\\FLang\\src\\Utils.hs")])
+2021-03-03 21:02:24.073399500000 [$pid(ThreadId 5)] ERROR APP - start debugging failed. user error (ExecResult not found.) : Left "user error (ExecResult not found.)"
+2021-03-03 21:03:45.741015900000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 21:03:54.168161100000 [$pid(ThreadId 5)] ERROR APP - user error (no stacktrace found.)
+2021-03-03 21:05:39.011923600000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 21:07:29.697766900000 [$pid(ThreadId 5)] ERROR APP - user error (no stacktrace found.)
+2021-03-03 21:07:35.093169000000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 21:12:52.853555500000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 21:13:31.861466900000 [$pid(ThreadId 5)] CRITICAL APP - invalid dap result from ghci. ["Stk [   1: NSupercomb main ]<<DAP>>Right (EvaluateResponseBody {resultEvaluateResponseBody = \"()\", typeEvaluateResponseBody = \"()\", presentationHintEvaluateResponseBody = Nothing, variablesReferenceEvaluateResponseBody = 0, namedVariablesEvaluateResponseBody = Nothing, indexedVariablesEvaluateResponseBody = Nothing})","H>>= "]
+2021-03-03 21:13:32.615522700000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 21:14:44.311894700000 [$pid(ThreadId 5)] ERROR APP - start debugging failed. user error (ExecResult not found.) : Left "user error (ExecResult not found.)"
+2021-03-03 21:14:53.114550900000 [$pid(ThreadId 5)] ERROR APP - start debugging failed. user error (ExecResult not found.) : Left "user error (ExecResult not found.)"
+2021-03-03 21:15:34.767660400000 [$pid(ThreadId 5)] ERROR APP - start debugging failed. user error (ExecResult not found.) : Left "user error (ExecResult not found.)"
+2021-03-03 21:15:41.507668800000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 21:16:14.710182600000 [$pid(ThreadId 5)] ERROR APP - user error (variable id:14 not found.)
+2021-03-03 21:18:48.700583900000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 21:21:26.511468000000 [$pid(ThreadId 5)] ERROR APP - user error (variable id:10 not found.)
+2021-03-03 21:29:19.609158200000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 21:32:11.978097700000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 21:35:45.700876400000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 21:35:53.230056600000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-03 21:37:47.989390000000 [$pid(ThreadId 5)] CRITICAL APP - invalid dap result from ghci. ["Stk [   8: NNum 1","       10: NAp    8    9 (NNum 2) ]<<DAP>>Right (EvaluateResponseBody {resultEvaluateResponseBody = \"()\", typeEvaluateResponseBody = \"()\", presentationHintEvaluateResponseBody = Nothing, variablesReferenceEvaluateResponseBody = 0, namedVariablesEvaluateResponseBody = Nothing, indexedVariablesEvaluateResponseBody = Nothing})","H>>= "]
+2021-03-03 21:37:48.521429400000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-04 08:35:10.832916900000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-04 08:36:37.618283500000 [$pid(ThreadId 5)] ERROR APP - user error (loaded module can not find from path. <c:\Users\rhala\Code\FLang\src\TiMachine.hs> [("Language","C:\\Users\\rhala\\Code\\FLang\\src\\Language.hs"),("Parser","C:\\Users\\rhala\\Code\\FLang\\src\\Parser.hs"),("ParserCombinator","C:\\Users\\rhala\\Code\\FLang\\src\\ParserCombinator.hs"),("Tokenizer","C:\\Users\\rhala\\Code\\FLang\\src\\Tokenizer.hs"),("Utils","C:\\Users\\rhala\\Code\\FLang\\src\\Utils.hs")])
+2021-03-04 08:36:37.686288600000 [$pid(ThreadId 5)] ERROR APP - start debugging failed. user error (ExecResult not found.) : Left "user error (ExecResult not found.)"
+2021-03-04 08:36:53.483467200000 [$pid(ThreadId 5)] ERROR APP - user error (loaded module can not find from path. <c:\Users\rhala\Code\FLang\src\TiMachine.hs> [("Language","C:\\Users\\rhala\\Code\\FLang\\src\\Language.hs"),("Parser","C:\\Users\\rhala\\Code\\FLang\\src\\Parser.hs"),("ParserCombinator","C:\\Users\\rhala\\Code\\FLang\\src\\ParserCombinator.hs"),("Tokenizer","C:\\Users\\rhala\\Code\\FLang\\src\\Tokenizer.hs"),("Utils","C:\\Users\\rhala\\Code\\FLang\\src\\Utils.hs")])
+2021-03-04 08:36:53.535483800000 [$pid(ThreadId 5)] ERROR APP - start debugging failed. user error (ExecResult not found.) : Left "user error (ExecResult not found.)"
+2021-03-04 08:36:59.716464500000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-04 08:37:39.049447800000 [$pid(ThreadId 5)] ERROR APP - user error (loaded module can not find from path. <c:\Users\rhala\Code\FLang\src\TiMachine.hs> [("Language","C:\\Users\\rhala\\Code\\FLang\\src\\Language.hs"),("Parser","C:\\Users\\rhala\\Code\\FLang\\src\\Parser.hs"),("ParserCombinator","C:\\Users\\rhala\\Code\\FLang\\src\\ParserCombinator.hs"),("Tokenizer","C:\\Users\\rhala\\Code\\FLang\\src\\Tokenizer.hs"),("Utils","C:\\Users\\rhala\\Code\\FLang\\src\\Utils.hs")])
+2021-03-04 08:37:39.101464200000 [$pid(ThreadId 5)] ERROR APP - start debugging failed. user error (ExecResult not found.) : Left "user error (ExecResult not found.)"
+2021-03-04 08:39:05.021475400000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-04 08:41:20.029173700000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-04 09:10:54.302108800000 [$pid(ThreadId 5)] CRITICAL APP - invalid dap result from ghci. ["[(\"main\",[],EAp (EVar \"K\") (EAp (ENum 1) (ENum 2)))]<<DAP>>Right (EvaluateResponseBody {resultEvaluateResponseBody = \"()\", typeEvaluateResponseBody = \"()\", presentationHintEvaluateResponseBody = Nothing, variablesReferenceEvaluateResponseBody = 0, namedVariablesEvaluateResponseBody = Nothing, indexedVariablesEvaluateResponseBody = Nothing})","H>>= "]
+2021-03-04 09:10:54.891152600000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.

@@ -1,2 +1,4 @@
+import TiMachine
+
 main :: IO ()
-main = putStrLn "Test suite not yet implemented"
+main = putStr $ runProg "main = K 1 2"

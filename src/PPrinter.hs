@@ -1,7 +1,7 @@
 module PPrinter where
 
 import Language
-import Seq
+import Utils
 
 --BAD PRETTY PRINTER CODE
 --THIS IS QUADRATIC:
