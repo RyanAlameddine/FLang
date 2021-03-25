@@ -4,16 +4,16 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 39c859a20254e15f9f42317d0ac751325f9f3ca1001cf17bbcfff738b6b07301
+-- hash: f359d6d08aabbe55f412fbff2d570203dc6797bf238ebf8ee0d32b85f3ab3412
 
 name:           FLang
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/FLang#readme>
-homepage:       https://github.com/githubuser/FLang#readme
-bug-reports:    https://github.com/githubuser/FLang/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2021 Author name here
+description:    Please see the README on GitHub at <https://github.com/RyanAlameddine/FLang#readme>
+homepage:       https://github.com/RyanAlameddine/FLang#readme
+bug-reports:    https://github.com/RyanAlameddine/FLang/issues
+author:         Ryan Alameddine
+maintainer:     rhalameddine@gmail.com
+copyright:      2021 Ryan Alameddine
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -28,6 +28,7 @@ source-repository head
 library
   exposed-modules:
       Compiler
+      GMachine
       Language
       Lib
       Parser

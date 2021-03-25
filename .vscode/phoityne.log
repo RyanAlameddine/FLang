@@ -67,3 +67,5 @@
 2021-03-04 08:41:20.029173700000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
 2021-03-04 09:10:54.302108800000 [$pid(ThreadId 5)] CRITICAL APP - invalid dap result from ghci. ["[(\"main\",[],EAp (EVar \"K\") (EAp (ENum 1) (ENum 2)))]<<DAP>>Right (EvaluateResponseBody {resultEvaluateResponseBody = \"()\", typeEvaluateResponseBody = \"()\", presentationHintEvaluateResponseBody = Nothing, variablesReferenceEvaluateResponseBody = 0, namedVariablesEvaluateResponseBody = Nothing, indexedVariablesEvaluateResponseBody = Nothing})","H>>= "]
 2021-03-04 09:10:54.891152600000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-04 16:40:57.345676900000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-04 16:41:08.442014900000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.

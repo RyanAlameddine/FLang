@@ -14,12 +14,16 @@ someFunc = putStrLn "someFunc"
 
 main :: IO ()
 --main = putStr $ runProg "main = S K K 3"
-main = putStr $ runProg "pair x y f = f x y ;\
-\fst p = p K ;\
-\snd p = p K1 ;\
-\f x y = letrec\
-\        a = pair x b ;\
-\        b = pair y a\
-\    in\
-\    fst (snd (snd (snd a))) ;\
-\main = f 3 4"
+-- main = putStr $ runProg "pair x y f = f x y ;\
+-- \fst p = p K ;\
+-- \snd p = p K1 ;\
+-- \f x y = letrec\
+-- \        a = pair x b ;\
+-- \        b = pair y a\
+-- \    in\
+-- \    fst (snd (snd (snd a))) ;\
+-- \main = f 3 4"
+main = putStr $ runProg "main = twice twice id 3"
+
+revr :: String -> String
+revr = foldl (flip (:)) []
