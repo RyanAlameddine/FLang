@@ -3,7 +3,7 @@ module Lib
     ) where
 
 import Parser
-import TiMachine
+import GMachine
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
@@ -23,7 +23,7 @@ main :: IO ()
 -- \    in\
 -- \    fst (snd (snd (snd a))) ;\
 -- \main = f 3 4"
-main = putStr $ runProg "main = twice twice id 3"
+main = putStr $ runProg "main = S K K 1"
 
 revr :: String -> String
 revr = foldl (flip (:)) []

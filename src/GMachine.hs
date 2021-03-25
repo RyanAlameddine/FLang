@@ -7,7 +7,7 @@ import Data.Traversable
 
 
 runProg :: [Char] -> [Char]
-runProg = showResults . eval . compile. parse
+runProg = showResults . eval . compile . parse
 
 data GmState = GmState { getCode :: GmCode, getStack :: GmStack, getHeap :: GmHeap, getGlobals :: GmGlobals, getStats :: GmStats }
 
@@ -18,7 +18,7 @@ data Instruction = Unwind
                 | Pushint Int
                 | Push Int
                 | Mkap
-                | Slide Int     deriving Eq
+                | Slide Int     deriving (Eq, Show)
 
 type GmStack = [Addr]
 

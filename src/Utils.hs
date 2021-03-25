@@ -61,6 +61,9 @@ aLookup ((k, v):kvs) k' def
     | k == k' = v
     | k /= k' = aLookup kvs k' def
 
+aDomain = map fst
+aRange  = map snd
+
 ------------------------
 -- SEQUENCE DATA TYPE --
 ------------------------
