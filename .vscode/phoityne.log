@@ -69,3 +69,18 @@
 2021-03-04 09:10:54.891152600000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
 2021-03-04 16:40:57.345676900000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
 2021-03-04 16:41:08.442014900000 [$pid(ThreadId 8)] CRITICAL THREAD_MGR - Critical exit started.
+2021-03-25 16:10:47.807897200000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-03-25 16:19:25.914941900000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-03-25 16:19:33.950397600000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-03-25 16:19:41.744361000000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-03-25 16:25:39.333396100000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-03-27 17:41:13.060986100000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-03-27 17:55:02.365397100000 [$pid(ThreadId 5)] ERROR APP - [CRITICAL] can not get the initial ghci prompt.
+2021-03-27 18:08:36.820236500000 [$pid(ThreadId 5)] ERROR APP - invalid dap result from ghci. []
+2021-03-27 18:08:36.820236500000 [$pid(ThreadId 5)] CRITICAL APP 2021-03-27 18:14:12.400376000000 [$pid(ThreadId 5)] CRITICAL APP - invalid dap result from ghci. []
+2021-03-27 18:17:42.665250100000 [$pid(ThreadId 5)] ERROR APP - start debugging failed. user error (ExecResult not found.) : Left "user error (ExecResult not found.)"
+2021-03-27 18:17:55.385702400000 [$pid(ThreadId 5)] ERROR APP - start debugging failed. user error (ExecResult not found.) : Left "user error (ExecResult not found.)"
+2021-03-27 18:18:08.221541500000 [$pid(ThreadId 5)] CRITICAL APP - invalid dap result from ghci. ["Supercombinator definintions","Code for id"," Code:{Push0","       Slide2","       Unwind}","","","","Code for K"," Code:{Push0","       Slide3","       Unwind}","","","","Code for K1"," Code:{Push1","       Slide3","       Unwind}","","","","Code for S"," Code:{Push2","       Push2","       Mkap","       Push3","       Push2","       Mkap","       Mkap","       Slide4","       Unwind}","","","","Code for compose"," Code:{Push2","       Push2","       Mkap","       Push1","       Mkap","       Slide4","       Unwind}","","","","Code for twice"," Code:{Push0","       Push1","       Pushglobalcompose","       Mkap","       Mkap","       Slide2","       Unwind}","","","","Code for main"," Code:{Pushint1","       PushglobalK","       PushglobalK","       PushglobalS","       Mkap","       Mkap","       Mkap","       Slide1","       Unwind}","","","","","State transitions","","1.  Stack:[<<DAP>>Right (StoppedEventBody {reasonStoppedEventBody = \"complete\", descriptionStoppedEventBody = \"\", threadIdStoppedEventBody = 0, textStoppedEventBody = \"\", allThreadsStoppedStoppedEventBody = True})","H>>= "]
+2021-03-28 11:03:47.389234600000 [$pid(ThreadId 5)] ERROR APP - invalid dap result from ghci. [" Stack:[<<DAP>>Right (StoppedEventBody {reasonStoppedEventBody = \"complete\", descriptionStoppedEventBody = \"\", threadIdStoppedEventBody = 0, textStoppedEventBody = \"\", allThreadsStoppedStoppedEventBody = True})","H>>= "]
+2021-03-28 18:47:50.866181700000 [$pid(ThreadId 5)] ERROR APP - user error (variable id:10 not found.)
+2021-03-28 18:47:55.264580700000 [$pid(ThreadId 5)] ERROR APP - user error (variable id:10 not found.)

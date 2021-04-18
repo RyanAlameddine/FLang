@@ -26,7 +26,8 @@ type GmHeap = Heap Node
 
 data Node = NNum Int
             | NAp Addr Addr
-            | NGlobal Int GmCode
+            | NGlobal Int GmCode 
+            deriving (Eq, Show)
 
 type GmGlobals = ASSOC Name Addr
 
@@ -45,7 +46,7 @@ eval state = state:rest
     where
         rest | gmFinal state = []
             | otherwise      = eval nextState
-        nextState = doAdmin $ step nextState
+        nextState = doAdmin $ step state
 
 doAdmin :: GmState -> GmState
 doAdmin state = state{getStats=statIncSteps $ getStats state}
@@ -70,9 +71,18 @@ pushglobal :: Name -> GmState -> GmState
 pushglobal f state = state{getStack = a : getStack state}
     where a = aLookup (getGlobals state) f $ error $ "Undeclared global " ++ f
 
+-- pushint :: Int -> GmState -> GmState
+-- pushint n state = state{getHeap = heap', getStack = a : getStack state}
+--     where (heap', a) = hAlloc (getHeap state) (NNum n)
 pushint :: Int -> GmState -> GmState
-pushint n state = state{getHeap = heap', getStack = a : getStack state}
-    where (heap', a) = hAlloc (getHeap state) (NNum n)
+pushint n state 
+    | addr /= elseAddr = state{getStack = stack'}
+    | otherwise  = state{getStack = stack', getHeap = heap', getGlobals = (show n, addr) : getGlobals state}
+    where 
+        stack' = addr : getStack state
+        addr = aLookup (getGlobals state) (show n) elseAddr --addr = hGetAddr (getHeap state) node elseAddr
+        (heap', elseAddr) = hAlloc (getHeap state) $ NNum n
+
 
 mkap :: GmState -> GmState
 mkap state = state{getHeap = heap', getStack = a:as'}
@@ -179,20 +189,18 @@ showInstructions is
 
 showInstruction :: Instruction -> Seq
 showInstruction Unwind         = sStr "Unwind"
-showInstruction (Pushglobal f) = sStr "Pushglobal" `sAppend` sStr f
-showInstruction (Push n)       = sStr "Push"       `sAppend` sNum n
-showInstruction (Pushint n)    = sStr "Pushint"    `sAppend` sNum n
+showInstruction (Pushglobal f) = sStr "Pushglobal " `sAppend` sStr f
+showInstruction (Push n)       = sStr "Push "       `sAppend` sNum n
+showInstruction (Pushint n)    = sStr "Pushint "    `sAppend` sNum n
 showInstruction Mkap           = sStr "Mkap"
-showInstruction (Slide n)      = sStr "Slide"      `sAppend` sNum n
+showInstruction (Slide n)      = sStr "Slide "      `sAppend` sNum n
 
 showState :: GmState -> Seq
 showState s = sConcat [showStack s, sNewline,
                         showInstructions $ getCode s, sNewline]
 
 showStack :: GmState -> Seq
-showStack s = sConcat [sStr " Stack:[",
-                        sIndent $ sIntercalate sNewline $ map (showStackItem s) (reverse $ getStack s), 
-                        sStr "]"]
+showStack s = sConcat [sStr " Stack:[", sIndent $ sIntercalate sNewline $ map (showStackItem s) (reverse $ getStack s), sStr "]"]
 
 showStackItem :: GmState -> Addr -> Seq
 showStackItem s a = sConcat [showAddr a, sStr ": ",

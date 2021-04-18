@@ -38,7 +38,14 @@ hFree    :: Heap a -> Addr -> Heap a
 hFree   (Heap s free        cts) a   =  Heap (s-1) (a:free) (remove cts a)
 
 hLookup :: Heap a -> Addr -> a
-hLookup (Heap s free cts) a = aLookup cts a (error ("can't find node " ++ show a ++ " in heap"))
+hLookup (Heap s free cts) a = aLookup cts a (error $ "can't find node " ++ show a ++ " in heap")
+
+hGetAddr :: (Eq a) => Heap a -> a -> Addr -> Addr
+hGetAddr (Heap _ _   cts) a def = match [addr | (addr, val) <- cts, val == a]
+    where 
+        match [ ] = def
+        match [v] = v
+        match _   = error "hGetAddr found more than one match in the heap"
 
 hAddrs  :: Heap a -> [Addr]
 hAddrs  (Heap s _    cts)   = [addr | (addr, node) <- cts]
@@ -56,6 +63,7 @@ remove ((a',n):ts) a | a == a' = ts
 
 type ASSOC a b = [(a,b)]
 
+aLookup :: Eq a => ASSOC a b -> a -> b -> b
 aLookup [] k' def    = def
 aLookup ((k, v):kvs) k' def 
     | k == k' = v
@@ -117,7 +125,8 @@ flatten col ((SNewline     , i) : seqs) = '\n' : replicate i ' ' ++ flatten i se
 flatten col ((SIndent seq  , _) : seqs) = flatten col ((seq, col) : seqs)           --set indent (doesnt update string)
 flatten col ((SStr s       , i) : seqs) = s ++ flatten (col + length s) seqs        --prepend string to next
 flatten col ((SAppend s1 s2, i) : seqs) = flatten col ((s1, i):(s2, i):seqs)        --flatten tree to list
-flatten _ _ = []
+flatten col ((SNil         , i) : seqs) = flatten col seqs                          --skip the nil
+flatten _ [] = ""
 
 --flatten [] = ""
 --flatten (SNil : seqs) = flatten seqs
