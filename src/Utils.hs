@@ -72,6 +72,11 @@ aLookup ((k, v):kvs) k' def
 aDomain = map fst
 aRange  = map snd
 
+setAt :: [a] -> Int -> a -> [a]
+setAt (x:xs) 0 v = v:xs
+setAt (x:xs) i v = x : setAt xs (i - 1) v
+setAt _ i _ = error $ "Specified integer " ++ show i ++ " was outside of bounds of the list"
+
 ------------------------
 -- SEQUENCE DATA TYPE --
 ------------------------

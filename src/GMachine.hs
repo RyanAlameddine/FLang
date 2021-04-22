@@ -18,7 +18,9 @@ data Instruction = Unwind
                 | Pushint Int
                 | Push Int
                 | Mkap
-                | Slide Int     deriving (Eq, Show)
+                | Update Int     
+                | Pop Int
+                deriving (Eq, Show)
 
 type GmStack = [Addr]
 
@@ -27,6 +29,7 @@ type GmHeap = Heap Node
 data Node = NNum Int
             | NAp Addr Addr
             | NGlobal Int GmCode 
+            | NInd Addr
             deriving (Eq, Show)
 
 type GmGlobals = ASSOC Name Addr
@@ -64,7 +67,8 @@ dispatch (Pushglobal f) = pushglobal f
 dispatch (Pushint n)    = pushint n
 dispatch Mkap           = mkap
 dispatch (Push n)       = push n
-dispatch (Slide n)      = slide n
+dispatch (Update n)     = update n
+dispatch (Pop n)        = pop n
 dispatch Unwind         = unwind
 
 pushglobal :: Name -> GmState -> GmState
@@ -99,9 +103,18 @@ push n state = state{getStack = a:as}
 getArg :: Node -> Addr
 getArg (NAp _ a2) = a2
 
-slide :: Int -> GmState -> GmState
-slide n state = state{getStack = a : drop n as}
-    where (a:as) = getStack state
+-- slide :: Int -> GmState -> GmState
+-- slide n state = state{getStack = a : drop n as}
+--     where (a:as) = getStack state
+
+update :: Int -> GmState -> GmState
+update n state = state{getStack = setAt as n addr, getHeap = heap'} --n + 1??
+    where
+        (a:as) = getStack state
+        (heap', addr) = hAlloc (getHeap state) (NInd a)
+
+pop :: Int -> GmState -> GmState
+pop n state = state{getStack = drop n $ getStack state}
 
 unwind :: GmState -> GmState
 unwind state = newState $ hLookup heap a
@@ -114,6 +127,7 @@ unwind state = newState $ hLookup heap a
         newState (NGlobal n c)
             | length as < n = error "Attempting to unwind with not enough arguments to apply"
             | otherwise     = state{getCode = c}
+        newState (NInd addr) = state{getCode = [Unwind], getStack = addr : as}
 
 compile :: CoreProgram -> GmState
 compile program = GmState{getCode=initialCode, getStack=[], getHeap=heap, getGlobals=globals, getStats=statInitial}
@@ -146,7 +160,9 @@ type GmEnvironment = ASSOC Name Int
 
 --R-scheme
 compileR :: GmCompiler
-compileR e env = compileC e env ++ [Slide (length env + 1), Unwind]
+compileR e env = compileC e env ++ [Update d, Pop d, Unwind] 
+    where d = length env --this might be wrong maybe?
+--compileR e env = compileC e env ++ [Slide (length env + 1), Unwind]
 
 --C-scheme
 compileC :: GmCompiler
@@ -193,7 +209,8 @@ showInstruction (Pushglobal f) = sStr "Pushglobal " `sAppend` sStr f
 showInstruction (Push n)       = sStr "Push "       `sAppend` sNum n
 showInstruction (Pushint n)    = sStr "Pushint "    `sAppend` sNum n
 showInstruction Mkap           = sStr "Mkap"
-showInstruction (Slide n)      = sStr "Slide "      `sAppend` sNum n
+showInstruction (Update n)     = sStr "Update "     `sAppend` sNum n
+showInstruction (Pop n)        = sStr "Pop "        `sAppend` sNum n
 
 showState :: GmState -> Seq
 showState s = sConcat [showStack s, sNewline,
@@ -206,14 +223,18 @@ showStackItem :: GmState -> Addr -> Seq
 showStackItem s a = sConcat [showAddr a, sStr ": ",
                                 showNode s a $ hLookup (getHeap s) a]
 
-showAddr addr = sStr $ show addr
+showAddr :: Addr -> Seq
+showAddr = sStr . show
 
 showNode :: GmState -> Addr -> Node -> Seq
-showNode s a (NNum n) = sNum n
-showNode s a (NGlobal n g) = sConcat [sStr "Global ", sStr v]
-    where v = head [n | (n, b) <- getGlobals s, a==b]
-showNode s a (NAp a1 a2 ) = sConcat [sStr "Ap ", showAddr a1,
-                                    sStr " ",    showAddr a2]
+showNode s a (NNum n)      = sNum n
+showNode s a (NAp a1 a2 )  = sConcat [sStr "Ap ", showAddr a1, 
+                                     sStr " ", showAddr a2]
+showNode s a (NGlobal n g) = let v = head [n | (n, b) <- getGlobals s, a==b] 
+                             in sConcat [sStr "Global ", sStr v]
+showNode s a (NInd addr)   = let v = hLookup (getHeap s) addr 
+                             in sConcat [sStr "Indirect ", showNode s addr v]
+
 
 showStats :: GmState -> Seq
 showStats s = sConcat [sStr "Steps taken = ", sNum $ getStats s]
