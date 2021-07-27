@@ -48,7 +48,7 @@ eval :: GmState -> [GmState]
 eval state = state:rest
     where
         rest | gmFinal state = []
-            | otherwise      = eval nextState
+             | otherwise      = eval nextState
         nextState = doAdmin $ step state
 
 doAdmin :: GmState -> GmState
@@ -89,16 +89,21 @@ pushint n state
 
 
 mkap :: GmState -> GmState
-mkap state = state{getHeap = heap', getStack = a:as'}
+mkap state = state{getHeap = heap, getStack = a:as}
     where 
-        (heap', a)  = hAlloc (getHeap state) (NAp a1 a2)
-        (a1:a2:as') = getStack state
+        (heap, a)  = hAlloc (getHeap state) (NAp a1 a2)
+        (a1:a2:as) = getStack state
 
 push :: Int -> GmState -> GmState
-push n state = state{getStack = a:as}
+push n state = state{getStack = an : stack}
     where 
-        as = getStack state
-        a  = getArg $ hLookup (getHeap state) (as !! (n + 1))
+        stack = getStack state
+        an = stack !! n
+
+-- push n state = state{getStack = a:as}
+--     where 
+--         as = getStack state
+--         a  = getArg $ hLookup (getHeap state) (as !! (n + 1))
 
 getArg :: Node -> Addr
 getArg (NAp _ a2) = a2
@@ -126,8 +131,14 @@ unwind state = newState $ hLookup heap a
         newState (NAp a1 a2) = state{getCode = [Unwind], getStack = a1:a:as}
         newState (NGlobal n c)
             | length as < n = error "Attempting to unwind with not enough arguments to apply"
-            | otherwise     = state{getCode = c}
+            | otherwise     = state{getCode = c, getStack = rearrange n heap (a:as)}
         newState (NInd addr) = state{getCode = [Unwind], getStack = addr : as}
+
+--replace each application node with it's right child (the actual values)
+rearrange :: Int -> GmHeap -> GmStack -> GmStack
+rearrange n heap as = take n as' ++ drop n as
+    where as' = map (getArg . hLookup heap) $ tail as
+
 
 compile :: CoreProgram -> GmState
 compile program = GmState{getCode=initialCode, getStack=[], getHeap=heap, getGlobals=globals, getStats=statInitial}
@@ -169,7 +180,7 @@ compileC :: GmCompiler
 compileC (EVar v) env
     | elem v $ aDomain env = [Push n]
     | otherwise            = [Pushglobal v]
-        where n = aLookup env v $ error "We just checked 'elem v'. This is practically impossible to throw."
+        where n = aLookup env v $ error "Couldn't find v, but we just checked 'elem v'. This is practically impossible to throw."
 compileC (ENum n)    env = [Pushint n]
 compileC (EAp e1 e2) env = compileC e2 env ++ compileC e1 (argOffset 1 env) ++ [Mkap]
 
@@ -238,4 +249,3 @@ showNode s a (NInd addr)   = let v = hLookup (getHeap s) addr
 
 showStats :: GmState -> Seq
 showStats s = sConcat [sStr "Steps taken = ", sNum $ getStats s]
-
