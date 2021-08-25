@@ -1,6 +1,6 @@
 # FLang
 
-FLang is a low(ish)-level functional programming language designed (by me) and inspired by the book "Implementing Functional Languages" by Simon Peyton Jones and David R Lester. 
+FLang is a low(ish)-level functional programming language (designed by me) and inspired by the book "Implementing Functional Languages" by Simon Peyton Jones and David R Lester. 
 
 ## Parser
 
